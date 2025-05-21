@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -16,9 +17,16 @@ import { Switch } from "@/components/ui/switch";
 interface SettingsPanelProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
+  crtEffectEnabled: boolean;
+  onCrtEffectChange: (enabled: boolean) => void;
 }
 
-export function SettingsPanel({ isOpen, onOpenChange }: SettingsPanelProps) {
+export function SettingsPanel({ 
+  isOpen, 
+  onOpenChange,
+  crtEffectEnabled,
+  onCrtEffectChange 
+}: SettingsPanelProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="bg-card border-2 border-t-[hsl(var(--border-light))] border-l-[hsl(var(--border-light))] border-b-[hsl(var(--border-dark))] border-r-[hsl(var(--border-dark))] text-card-foreground w-[90vw] max-w-md">
@@ -37,7 +45,12 @@ export function SettingsPanel({ isOpen, onOpenChange }: SettingsPanelProps) {
 
           <div className="flex items-center justify-between space-y-2">
             <Label htmlFor="crt-effect" className="text-foreground">CRT Scanline Effect:</Label>
-            <Switch id="crt-effect" className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-muted" />
+            <Switch 
+              id="crt-effect" 
+              checked={crtEffectEnabled}
+              onCheckedChange={onCrtEffectChange}
+              className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-muted" 
+            />
           </div>
 
           <div className="flex items-center justify-between space-y-2">
@@ -51,7 +64,7 @@ export function SettingsPanel({ isOpen, onOpenChange }: SettingsPanelProps) {
         </div>
         <DialogFooter className="p-2 border-t-2 border-t-[hsl(var(--border-light))]">
           <RetroButton variant="default" onClick={() => onOpenChange(false)}>Cancel</RetroButton>
-          <RetroButton variant="primary" onClick={() => onOpenChange(false)}>Save Changes</RetroButton>
+          <RetroButton variant="primary" onClick={() => { /* Future: save all settings */ onOpenChange(false); }}>Save Changes</RetroButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>
