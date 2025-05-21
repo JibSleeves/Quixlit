@@ -14,6 +14,7 @@ import {z} from 'genkit';
 const GenerateCodeFromPromptInputSchema = z.object({
   prompt: z.string().describe('A natural language description of the program or code snippet to generate.'),
   language: z.string().optional().describe('The preferred programming language (e.g., "TypeScript", "Python"). If not specified, the AI will choose a suitable language based on the prompt.'),
+  currentCodeContext: z.string().optional().describe('Optional existing code context to which the generated code should relate or integrate.'),
 });
 export type GenerateCodeFromPromptInput = z.infer<typeof GenerateCodeFromPromptInputSchema>;
 
@@ -46,9 +47,18 @@ Consider this preferred language. If the prompt implies a different language or 
 No specific language preferred. Choose the most appropriate language based on the prompt and state it in 'languageUsed'.
 {{/if}}
 
+{{#if currentCodeContext}}
+Consider the following existing code context:
+\`\`\`
+{{{currentCodeContext}}}
+\`\`\`
+The generated code should relate to or integrate with this context. Ensure your response only includes the NEW or MODIFIED code that addresses the prompt, fitting into this context, rather than repeating the context itself.
+{{/if}}
+
 Generate the code and provide an optional explanation.
 Focus on generating the code for the core request. Avoid creating full HTML pages or extensive boilerplate unless specifically asked.
 For example, if asked for "a React component that displays a button", generate the JSX and JavaScript for the component, not an entire HTML document with React setup.
+If context is provided, and the prompt is "add a click handler to the button in context", only provide the modified button component or the handler function and how to integrate it.
 `,
 });
 
@@ -62,9 +72,8 @@ const generateCodeFromPromptFlow = ai.defineFlow(
     const {output} = await prompt(input);
     // Ensure languageUsed is set, defaulting if necessary
     if (output && !output.languageUsed) {
-        output.languageUsed = input.language || "unknown";
+        output.languageUsed = input.language || "unknown (prompt may specify)";
     }
     return output!;
   }
 );
-

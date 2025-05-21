@@ -10,11 +10,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { generateCodeFromPrompt, type GenerateCodeFromPromptInput, type GenerateCodeFromPromptOutput } from '@/ai/flows/generate-code-from-prompt-flow';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Loader2, Sparkles, Wand } from 'lucide-react'; // Changed icon to Wand
+import { Loader2, Sparkles, Wand } from 'lucide-react';
 
 export function CodeGenerator() {
   const [prompt, setPrompt] = useState('');
   const [language, setLanguage] = useState('');
+  const [currentCodeContext, setCurrentCodeContext] = useState('');
   const [generatedResult, setGeneratedResult] = useState<GenerateCodeFromPromptOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +33,11 @@ export function CodeGenerator() {
     setGeneratedResult(null);
 
     try {
-      const input: GenerateCodeFromPromptInput = { prompt, language: language || undefined };
+      const input: GenerateCodeFromPromptInput = { 
+        prompt, 
+        language: language || undefined,
+        currentCodeContext: currentCodeContext || undefined,
+      };
       const result = await generateCodeFromPrompt(input);
       setGeneratedResult(result);
       toast({ title: "Success", description: `Code generated in ${result.languageUsed}!` });
@@ -47,51 +52,70 @@ export function CodeGenerator() {
 
   return (
     <RetroWindow title="AI CodeGen Pro" className="h-full flex flex-col">
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <div>
-          <Label htmlFor="codePrompt" className="block mb-1 text-sm font-medium text-foreground">
-            Describe the code to generate:
-          </Label>
-          <Textarea
-            id="codePrompt"
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder="e.g., A Python function to sort a list of dictionaries by a specific key."
-            rows={3}
-            className="w-full bg-input text-foreground border-[hsl(var(--border))] focus:border-primary min-h-[60px] text-sm"
-            disabled={isLoading}
-          />
+      <form onSubmit={handleSubmit} className="space-y-3 flex-grow flex flex-col">
+        <div className="flex-grow flex flex-col space-y-3">
+          <div>
+            <Label htmlFor="codePrompt" className="block mb-1 text-sm font-medium text-foreground">
+              Describe the code to generate:
+            </Label>
+            <Textarea
+              id="codePrompt"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="e.g., A Python function to sort a list of dictionaries by a specific key."
+              rows={2} // Reduced rows for prompt
+              className="w-full bg-input text-foreground border-[hsl(var(--border))] focus:border-primary min-h-[40px] text-sm"
+              disabled={isLoading}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="currentCodeContext" className="block mb-1 text-sm font-medium text-foreground">
+              Current Code Context (optional):
+            </Label>
+            <Textarea
+              id="currentCodeContext"
+              value={currentCodeContext}
+              onChange={(e) => setCurrentCodeContext(e.target.value)}
+              placeholder="Paste existing code here if the new code should integrate with it."
+              rows={3} // Reduced rows for context
+              className="w-full bg-input text-foreground border-[hsl(var(--border))] focus:border-primary min-h-[60px] text-sm font-mono"
+              disabled={isLoading}
+            />
+          </div>
+        
+          <div>
+            <Label htmlFor="language" className="block mb-1 text-sm font-medium text-foreground">
+              Preferred Language (optional):
+            </Label>
+            <Input
+              id="language"
+              type="text"
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              placeholder="e.g., JavaScript, Python"
+              className="w-full bg-input text-foreground border-[hsl(var(--border))] focus:border-primary text-sm"
+              disabled={isLoading}
+            />
+          </div>
         </div>
 
-        <div>
-          <Label htmlFor="language" className="block mb-1 text-sm font-medium text-foreground">
-            Preferred Language (optional):
-          </Label>
-          <Input
-            id="language"
-            type="text"
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            placeholder="e.g., JavaScript, Python"
-            className="w-full bg-input text-foreground border-[hsl(var(--border))] focus:border-primary text-sm"
-            disabled={isLoading}
-          />
+        <div className="mt-auto"> {/* Pushes button to bottom if form grows */}
+          <RetroButton type="submit" disabled={isLoading} variant="primary" className="w-full">
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generating Code...
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 h-4 w-4" />
+                Generate Code
+              </>
+            )}
+          </RetroButton>
+          {error && <p className="text-sm text-destructive mt-2">{error}</p>}
         </div>
-
-        <RetroButton type="submit" disabled={isLoading} variant="primary" className="w-full">
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Generating Code...
-            </>
-          ) : (
-            <>
-              <Sparkles className="mr-2 h-4 w-4" />
-              Generate Code
-            </>
-          )}
-        </RetroButton>
-        {error && <p className="text-sm text-destructive">{error}</p>}
       </form>
       
       <div className="mt-4 flex-grow flex flex-col min-h-0">
@@ -109,7 +133,7 @@ export function CodeGenerator() {
                     Language: {generatedResult.languageUsed}
                 </span>
             </div>
-            <ScrollArea className="flex-grow p-2 border border-[hsl(var(--border-dark))] bg-input mb-2 min-h-[100px] max-h-[200px]">
+            <ScrollArea className="flex-grow p-2 border border-[hsl(var(--border-dark))] bg-input mb-2 min-h-[80px] max-h-[150px]">
               <Textarea
                   value={generatedResult.generatedCode}
                   readOnly
@@ -120,7 +144,7 @@ export function CodeGenerator() {
             {generatedResult.explanation && (
                 <>
                 <h4 className="text-sm font-semibold text-accent mb-1">Explanation:</h4>
-                <ScrollArea className="h-24 p-2 border border-[hsl(var(--border-dark))] bg-input">
+                <ScrollArea className="h-[60px] p-2 border border-[hsl(var(--border-dark))] bg-input">
                     <p className="text-xs text-muted-foreground whitespace-pre-wrap">{generatedResult.explanation}</p>
                 </ScrollArea>
                 </>
@@ -131,7 +155,7 @@ export function CodeGenerator() {
            <div className="flex flex-col items-center justify-center flex-grow text-muted-foreground">
              <Wand className="h-8 w-8 text-muted-foreground mb-2" />
              <p>Describe the code you want to generate.</p>
-             <p className="text-xs">Optionally, specify a preferred language.</p>
+             <p className="text-xs">Optionally, provide context and language.</p>
            </div>
          )}
       </div>
