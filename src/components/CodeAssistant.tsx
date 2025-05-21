@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, type FormEvent } from 'react';
@@ -9,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { askAboutCodebase, type AskAboutCodebaseInput } from '@/ai/flows/codebase-aware-assistant';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Loader2 } from 'lucide-react'; // Import a loader icon
 
 interface CodeAssistantProps {
   codebaseIndex: string | null;
@@ -35,7 +37,7 @@ export function CodeAssistant({ codebaseIndex }: CodeAssistantProps) {
     }
     setError(null);
     setIsLoading(true);
-    setAnswer('');
+    setAnswer(''); // Clear previous answer
 
     try {
       const input: AskAboutCodebaseInput = { question, codebaseIndex };
@@ -53,7 +55,7 @@ export function CodeAssistant({ codebaseIndex }: CodeAssistantProps) {
 
   return (
     <RetroWindow title="AI Code Assistant 2000" className="h-full flex flex-col">
-      <form onSubmit={handleSubmit} className="space-y-4 flex-grow flex flex-col">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <Label htmlFor="question" className="block mb-1 text-sm font-medium text-foreground">
             Ask about your codebase:
@@ -70,26 +72,48 @@ export function CodeAssistant({ codebaseIndex }: CodeAssistantProps) {
         </div>
 
         <RetroButton type="submit" disabled={isLoading || !codebaseIndex} variant="accent" className="w-full">
-          {isLoading ? 'Thinking...' : 'Ask Assistant'}
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Thinking...
+            </>
+          ) : (
+            'Ask Assistant'
+          )}
         </RetroButton>
 
-        {!codebaseIndex && <p className="text-sm text-muted-foreground">Please generate a codebase index first to enable the assistant.</p>}
+        {!codebaseIndex && !isLoading && <p className="text-sm text-muted-foreground">Please generate a codebase index first to enable the assistant.</p>}
         {error && <p className="text-sm text-destructive">{error}</p>}
       </form>
       
-      {answer && (
-        <div className="mt-4 flex-grow flex flex-col">
-          <h3 className="text-md font-semibold text-primary">Assistant's Answer:</h3>
-          <ScrollArea className="h-48 flex-grow mt-1 p-2 border border-[hsl(var(--border-dark))] bg-input">
-             <Textarea
-                value={answer}
-                readOnly
-                rows={8}
-                className="w-full bg-input text-foreground border-0 focus:ring-0 resize-none"
-             />
-          </ScrollArea>
-        </div>
-      )}
+      <div className="mt-4 flex-grow flex flex-col min-h-0">
+        {isLoading && !answer && (
+          <div className="flex items-center justify-center flex-grow">
+            <div className="flex flex-col items-center text-muted-foreground">
+              <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
+              <p>Consulting the AI archives...</p>
+            </div>
+          </div>
+        )}
+        {answer && (
+          <>
+            <h3 className="text-md font-semibold text-primary mb-1">Assistant's Answer:</h3>
+            <ScrollArea className="flex-grow p-2 border border-[hsl(var(--border-dark))] bg-input">
+              <Textarea
+                  value={answer}
+                  readOnly
+                  className="w-full h-full bg-input text-foreground border-0 focus:ring-0 resize-none min-h-[100px]"
+                  aria-label="Assistant's answer"
+              />
+            </ScrollArea>
+          </>
+        )}
+         {!isLoading && !answer && !error && codebaseIndex && (
+           <div className="flex items-center justify-center flex-grow text-muted-foreground">
+             <p>Ask a question to get started.</p>
+           </div>
+         )}
+      </div>
     </RetroWindow>
   );
 }
