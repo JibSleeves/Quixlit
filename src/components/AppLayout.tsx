@@ -6,7 +6,7 @@ import { Header } from '@/components/Header';
 import { SettingsPanel } from '@/components/SettingsPanel';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { RetroMenuBar } from '@/components/RetroMenuBar'; // Import the new menu bar
+import { RetroMenuBar } from '@/components/RetroMenuBar';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -23,13 +23,12 @@ export function AppLayout({ children }: AppLayoutProps) {
       setCrtEffectEnabled(JSON.parse(savedCrtSetting));
     }
 
-    // Update time every second
     const intervalId = setInterval(() => {
-      setCurrentTime(new Date().toLocaleTimeString());
+      setCurrentTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
     }, 1000);
-    setCurrentTime(new Date().toLocaleTimeString()); // Initial time
+    setCurrentTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })); // Initial time
 
-    return () => clearInterval(intervalId); // Cleanup interval on unmount
+    return () => clearInterval(intervalId);
   }, []);
 
   const handleCrtEffectToggle = (enabled: boolean) => {
@@ -41,18 +40,18 @@ export function AppLayout({ children }: AppLayoutProps) {
     <div className={cn("flex flex-col min-h-screen bg-background")}>
       {crtEffectEnabled && <div className="crt-scanline-effect" />}
       <Header onSettingsClick={() => setIsSettingsOpen(true)} />
-      <RetroMenuBar /> 
-      <main className="flex-grow p-4 overflow-auto flex flex-col"> {/* Added flex flex-col for main content area */}
+      <RetroMenuBar />
+      <main className="flex-grow p-4 overflow-auto flex flex-col">
         {children}
       </main>
-      <SettingsPanel 
-        isOpen={isSettingsOpen} 
+      <SettingsPanel
+        isOpen={isSettingsOpen}
         onOpenChange={setIsSettingsOpen}
         crtEffectEnabled={crtEffectEnabled}
         onCrtEffectChange={handleCrtEffectToggle}
       />
        <footer className="px-2 py-1 text-xs text-muted-foreground border-t-2 border-t-[hsl(var(--border-light))] bg-card select-none flex justify-between items-center print:hidden">
-        <span>Nostalgia AI v0.1.0 - Ready.</span>
+        <span>Quixlit v0.1.0 - Ready.</span>
         <div className="flex items-center space-x-2">
           <span className="px-1 border border-border-dark bg-input">CPU: 100%</span>
           <span className="px-1 border border-border-dark bg-input">MEM: 256MB</span>

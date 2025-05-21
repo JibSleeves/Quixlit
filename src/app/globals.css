@@ -8,58 +8,56 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 13%; /* #222222 Dark Charcoal Gray */
-    --foreground: 0 0% 88%; /* #E0E0E0 Light Gray for text */
+    /* Quixlit Pixel Art Theme */
+    --background: 220 30% 10%; /* #111122 Very Dark Desaturated Blue/Purple */
+    --foreground: 210 50% 90%; /* #d9e6f2 Pale Cool White */
 
-    --card: 0 0% 16%; /* #2A2A2A Slightly lighter than background */
-    --card-foreground: 0 0% 88%; /* #E0E0E0 */
+    --card: 220 25% 15%; /* #1A1A2E Slightly lighter than background */
+    --card-foreground: 210 50% 90%; /* #d9e6f2 */
 
-    --popover: 0 0% 16%; /* #2A2A2A */
-    --popover-foreground: 0 0% 88%; /* #E0E0E0 */
+    --popover: 220 25% 15%; /* #1A1A2E */
+    --popover-foreground: 210 50% 90%; /* #d9e6f2 */
 
-    --primary: 74 100% 50%; /* #CCFF00 Electric Lime */
-    --primary-foreground: 0 0% 13%; /* #222222 Dark text on lime */
+    --primary: 180 100% 50%; /* #00FFFF Cyan */
+    --primary-foreground: 220 30% 5%; /* #090911 Darker text on cyan for contrast */
 
-    --secondary: 0 0% 20%; /* #333333 Another shade of gray */
-    --secondary-foreground: 74 100% 50%; /* #CCFF00 Lime text on secondary */
+    --secondary: 240 20% 20%; /* #26263D Dark Blue-Gray */
+    --secondary-foreground: 180 100% 50%; /* #00FFFF Cyan text on secondary */
 
-    --muted: 0 0% 27%; /* #444444 Muted gray */
-    --muted-foreground: 0 0% 67%; /* #AAAAAA Lighter muted text */
+    --muted: 240 15% 30%; /* #404054 Muted Blue-Gray */
+    --muted-foreground: 210 30% 70%; /* #9cb5cc Lighter muted text */
 
-    --accent: 300 100% 50%; /* #FF00FF Magenta */
-    --accent-foreground: 0 0% 100%; /* #FFFFFF White text on magenta */
+    --accent: 300 100% 65%; /* #FF4DFF Bright Magenta/Pink */
+    --accent-foreground: 0 0% 100%; /* #FFFFFF White text on accent */
 
-    --destructive: 0 100% 63%; /* #FF4444 Retro Red */
+    --destructive: 0 80% 60%; /* #F26666 Softer Retro Red */
     --destructive-foreground: 0 0% 100%; /* #FFFFFF */
 
-    --border: 0 0% 27%; /* #444444 General borders */
-    /* Custom border shades for beveled effect */
-    --border-light: 0 0% 35%; /* Lighter border for top/left bevel */
-    --border-dark: 0 0% 10%;  /* Darker border for bottom/right bevel */
-    
-    --input: 0 0% 20%; /* #333333 */
-    --ring: 74 100% 50%; /* #CCFF00 Lime for focus rings */
-    
-    --chart-1: 74 100% 50%; /* Electric Lime */
-    --chart-2: 300 100% 50%; /* Magenta */
-    --chart-3: 200 100% 50%; /* Cyan */
-    --chart-4: 0 0% 60%;   /* Gray */
-    --chart-5: 45 100% 50%;  /* Orange */
+    --border: 240 15% 25%; /* #343442 General borders, slightly darker than muted */
+    --border-light: 240 15% 35%; /* #4D4D60 Lighter border for top/left bevel */
+    --border-dark: 220 30% 5%;  /* #090911 Darker border for bottom/right bevel */
 
-    --radius: 0.25rem; /* Slightly reduced radius for blockier feel */
+    --input: 240 20% 18%; /* #222230 Slightly darker than secondary for input fields */
+    --ring: 180 100% 50%; /* #00FFFF Cyan for focus rings */
 
-    /* Sidebar variables, updated to match the dark theme */
-    --sidebar-background: 0 0% 10%;
-    --sidebar-foreground: 0 0% 88%;
-    --sidebar-primary: 74 100% 50%;
-    --sidebar-primary-foreground: 0 0% 13%;
-    --sidebar-accent: 300 100% 50%;
+    --chart-1: 180 100% 50%; /* Cyan */
+    --chart-2: 300 100% 65%; /* Bright Magenta/Pink */
+    --chart-3: 60 100% 50%;  /* Yellow */
+    --chart-4: 210 30% 70%; /* Muted Text Gray */
+    --chart-5: 25 100% 60%;  /* Orange */
+
+    --radius: 0.25rem;
+
+    /* Sidebar variables, updated to match the new theme */
+    --sidebar-background: 220 30% 8%; /* Even darker for sidebar */
+    --sidebar-foreground: 210 50% 85%;
+    --sidebar-primary: 180 100% 50%;
+    --sidebar-primary-foreground: 220 30% 5%;
+    --sidebar-accent: 300 100% 65%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 0 0% 20%;
-    --sidebar-ring: 74 100% 50%;
+    --sidebar-border: 240 15% 20%;
+    --sidebar-ring: 180 100% 50%;
   }
-
-  /* Remove .dark class as the theme is dark by default */
 }
 
 @layer base {
@@ -68,11 +66,11 @@ body {
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-geist-mono), monospace; /* Apply mono font */
+    font-family: var(--font-geist-mono), monospace;
   }
 }
 
-/* Style for chunky scrollbars - note: limited cross-browser support */
+/* Chunky Scrollbars - using new theme variables */
 ::-webkit-scrollbar {
   width: 16px;
   height: 16px;
@@ -98,7 +96,7 @@ body {
   background: hsl(var(--background));
 }
 
-/* Basic beveled button styling, can be applied via a component or utility class */
+/* Retro Button (already defined, colors will adapt via CSS variables) */
 .retro-btn {
   @apply px-4 py-2 bg-muted text-foreground border-2 transition-all duration-150;
   border-top-color: hsl(var(--border-light));
@@ -121,7 +119,7 @@ body {
   @apply pt-[10px] pb-[6px]; /* Simulate button press */
 }
 
-/* CRT Scanline Effect */
+/* CRT Scanline Effect (colors will adapt) */
 .crt-scanline-effect {
   position: fixed;
   top: 0;
@@ -129,8 +127,8 @@ body {
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  z-index: 9999; /* High z-index to overlay everything */
-  opacity: 0.15; /* Adjust overall intensity of scanlines */
+  z-index: 9999;
+  opacity: 0.1; /* Reduced opacity for subtlety with new dark theme */
 }
 
 .crt-scanline-effect::before {
@@ -143,10 +141,24 @@ body {
   height: 100%;
   background: linear-gradient(
     to bottom,
-    hsla(var(--foreground) / 0.5) 0px, /* Thinner, more subtle line */
-    hsla(var(--foreground) / 0.5) 1px,
+    hsla(var(--foreground) / 0.3) 0px, /* Slightly less opaque lines */
+    hsla(var(--foreground) / 0.3) 1px,
     transparent 1px,
-    transparent 3px /* Adjust spacing: 1px line, 2px transparent */
+    transparent 4px /* Wider spacing */
   );
-  background-size: 100% 3px; /* Adjust size: line + space */
+  background-size: 100% 4px;
+}
+
+/* Logo Animation */
+@keyframes logoGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 3px hsl(var(--primary) / 0.7)) drop-shadow(0 0 6px hsl(var(--primary) / 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 5px hsl(var(--primary) / 0.9)) drop-shadow(0 0 10px hsl(var(--primary) / 0.7));
+  }
+}
+
+.quixlit-logo-animate svg .logo-primary-fill {
+  animation: logoGlow 3s infinite ease-in-out;
 }
