@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, type FormEvent } from 'react';
@@ -9,6 +10,7 @@ import { DefragmenterAnimation } from '@/components/DefragmenterAnimation';
 import { useToast } from '@/hooks/use-toast';
 import { generateIndex, type GenerateIndexInput } from '@/ai/flows/generate-index';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Info } from 'lucide-react';
 
 interface CodeIndexerProps {
   onIndexGenerated: (index: string) => void;
@@ -49,7 +51,7 @@ export function CodeIndexer({ onIndexGenerated }: CodeIndexerProps) {
 
   return (
     <RetroWindow title="Codebase Indexer v1.0" className="h-full flex flex-col">
-      <form onSubmit={handleSubmit} className="space-y-4 flex flex-col flex-grow">
+      <form onSubmit={handleSubmit} className="space-y-4 flex flex-col">
         <div>
           <Label htmlFor="codebaseDescription" className="block mb-1 text-sm font-medium text-foreground">
             Enter Codebase Description:
@@ -74,11 +76,24 @@ export function CodeIndexer({ onIndexGenerated }: CodeIndexerProps) {
 
       <DefragmenterAnimation isIndexing={isIndexing} />
 
+      {!isIndexing && !generatedIndex && !error && (
+        <div className="mt-4 flex flex-col items-center justify-center flex-grow text-muted-foreground text-center">
+          <Info className="h-8 w-8 text-muted-foreground mb-2" />
+          <p>Describe your codebase above to generate an index.</p>
+          <p className="text-xs">This index will power the AI Code Assistant.</p>
+        </div>
+      )}
+      
       {generatedIndex && !isIndexing && (
-        <div className="mt-4 flex-grow flex flex-col">
+        <div className="mt-4 flex-grow flex flex-col min-h-0">
           <h3 className="text-md font-semibold text-accent">Generated Index:</h3>
-          <ScrollArea className="h-32 flex-grow mt-1 p-2 border border-[hsl(var(--border-dark))] bg-input">
-            <pre className="text-xs whitespace-pre-wrap break-all">{generatedIndex}</pre>
+          <ScrollArea className="flex-grow mt-1 p-2 border border-[hsl(var(--border-dark))] bg-input min-h-[100px] max-h-[150px]">
+            <Textarea 
+                value={generatedIndex} 
+                readOnly 
+                className="text-xs whitespace-pre-wrap break-all w-full h-full bg-input text-foreground border-0 focus:ring-0 resize-none font-mono"
+                aria-label="Generated codebase index"
+            />
           </ScrollArea>
         </div>
       )}

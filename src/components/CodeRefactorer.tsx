@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { refactorCode, type RefactorCodeInput, type RefactorCodeOutput } from '@/ai/flows/refactor-code-flow';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Loader2, Wand2 } from 'lucide-react'; // Import loader and an icon for refactoring
+import { Loader2, Wand2, Wrench } from 'lucide-react'; // Changed icon to Wrench
 
 export function CodeRefactorer() {
   const [originalCode, setOriginalCode] = useState('');
@@ -101,28 +101,26 @@ export function CodeRefactorer() {
       
       <div className="mt-4 flex-grow flex flex-col min-h-0">
         {isLoading && !refactoredResult && (
-          <div className="flex items-center justify-center flex-grow">
-            <div className="flex flex-col items-center text-muted-foreground">
-              <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
-              <p>AI is conjuring improvements...</p>
-            </div>
+          <div className="flex flex-col items-center justify-center flex-grow text-muted-foreground">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
+            <p>AI is conjuring improvements...</p>
           </div>
         )}
-        {refactoredResult && (
+        {refactoredResult && !isLoading && (
           <>
             <h3 className="text-md font-semibold text-primary mb-1">Refactored Code:</h3>
-            <ScrollArea className="flex-grow p-2 border border-[hsl(var(--border-dark))] bg-input mb-2">
+            <ScrollArea className="flex-grow p-2 border border-[hsl(var(--border-dark))] bg-input mb-2 min-h-[100px] max-h-[200px]">
               <Textarea
                   value={refactoredResult.refactoredCode}
                   readOnly
-                  className="w-full h-full bg-input text-foreground border-0 focus:ring-0 resize-none min-h-[100px] font-mono text-xs"
+                  className="w-full h-full bg-input text-foreground border-0 focus:ring-0 resize-none font-mono text-xs"
                   aria-label="Refactored code"
               />
             </ScrollArea>
             {refactoredResult.explanation && (
                 <>
                 <h4 className="text-sm font-semibold text-accent mb-1">Explanation:</h4>
-                <ScrollArea className="h-20 p-2 border border-[hsl(var(--border-dark))] bg-input">
+                <ScrollArea className="h-24 p-2 border border-[hsl(var(--border-dark))] bg-input">
                     <p className="text-xs text-muted-foreground whitespace-pre-wrap">{refactoredResult.explanation}</p>
                 </ScrollArea>
                 </>
@@ -130,8 +128,10 @@ export function CodeRefactorer() {
           </>
         )}
          {!isLoading && !refactoredResult && !error && (
-           <div className="flex items-center justify-center flex-grow text-muted-foreground">
-             <p>Enter code and instructions to start refactoring.</p>
+           <div className="flex flex-col items-center justify-center flex-grow text-muted-foreground">
+                <Wrench className="h-8 w-8 text-muted-foreground mb-2" />
+                <p>Enter code and instructions</p>
+                <p className="text-xs">to start refactoring.</p>
            </div>
          )}
       </div>

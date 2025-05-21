@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { askAboutCodebase, type AskAboutCodebaseInput } from '@/ai/flows/codebase-aware-assistant';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Loader2 } from 'lucide-react'; // Import a loader icon
+import { Loader2, HelpCircle } from 'lucide-react';
 
 interface CodeAssistantProps {
   codebaseIndex: string | null;
@@ -37,7 +37,7 @@ export function CodeAssistant({ codebaseIndex }: CodeAssistantProps) {
     }
     setError(null);
     setIsLoading(true);
-    setAnswer(''); // Clear previous answer
+    setAnswer(''); 
 
     try {
       const input: AskAboutCodebaseInput = { question, codebaseIndex };
@@ -88,30 +88,37 @@ export function CodeAssistant({ codebaseIndex }: CodeAssistantProps) {
       
       <div className="mt-4 flex-grow flex flex-col min-h-0">
         {isLoading && !answer && (
-          <div className="flex items-center justify-center flex-grow">
-            <div className="flex flex-col items-center text-muted-foreground">
-              <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
-              <p>Consulting the AI archives...</p>
-            </div>
+          <div className="flex flex-col items-center justify-center flex-grow text-muted-foreground">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
+            <p>Consulting the AI archives...</p>
           </div>
         )}
-        {answer && (
+        {answer && !isLoading && (
           <>
             <h3 className="text-md font-semibold text-primary mb-1">Assistant's Answer:</h3>
             <ScrollArea className="flex-grow p-2 border border-[hsl(var(--border-dark))] bg-input">
               <Textarea
                   value={answer}
                   readOnly
-                  className="w-full h-full bg-input text-foreground border-0 focus:ring-0 resize-none min-h-[100px]"
+                  className="w-full h-full bg-input text-foreground border-0 focus:ring-0 resize-none min-h-[100px] font-mono text-xs"
                   aria-label="Assistant's answer"
               />
             </ScrollArea>
           </>
         )}
          {!isLoading && !answer && !error && codebaseIndex && (
-           <div className="flex items-center justify-center flex-grow text-muted-foreground">
+           <div className="flex flex-col items-center justify-center flex-grow text-muted-foreground">
+             <HelpCircle className="h-8 w-8 text-muted-foreground mb-2" />
              <p>Ask a question to get started.</p>
+             <p className="text-xs">The AI will use the generated index to answer.</p>
            </div>
+         )}
+         {!isLoading && !answer && !error && !codebaseIndex && (
+            <div className="flex flex-col items-center justify-center flex-grow text-muted-foreground">
+                <HelpCircle className="h-8 w-8 text-muted-foreground mb-2" />
+                <p>Generate a codebase index using the "Codebase Indexer"</p>
+                <p className="text-xs">to enable the Code Assistant.</p>
+            </div>
          )}
       </div>
     </RetroWindow>

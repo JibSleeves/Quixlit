@@ -40,7 +40,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         crtEffectEnabled={crtEffectEnabled}
         onCrtEffectChange={handleCrtEffectToggle}
       />
-       <footer className="p-2 text-center text-xs text-muted-foreground border-t-2 border-t-[hsl(var(--border-light))] bg-background">
+       <footer className="p-2 text-center text-xs text-muted-foreground border-t-2 border-t-[hsl(var(--border-light))] bg-background select-none">
         Nostalgia AI v0.1.0 - Ready.
       </footer>
     </div>

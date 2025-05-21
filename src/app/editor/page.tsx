@@ -5,7 +5,7 @@ import { AppLayout } from '@/components/AppLayout';
 import { RetroWindow } from '@/components/RetroWindow';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils'; // Import cn for conditional classes
+import { cn } from '@/lib/utils'; 
 
 // Define some file/folder data - in a real app, this would come from an API or state
 const fileSystemItems = [
@@ -33,8 +33,10 @@ export default function EditorPage() {
                   <li
                     key={index}
                     className={cn(
-                      "text-sm text-foreground cursor-pointer hover:bg-muted/50 p-1 select-none",
-                      "border border-transparent active:border-[hsl(var(--border-dark))] active:shadow-inner active:bg-input", // Basic button-like interaction
+                      "text-sm text-foreground cursor-pointer p-1 select-none",
+                      "border border-transparent",
+                      "hover:bg-muted/60 hover:border-[hsl(var(--border))]",
+                      "active:bg-muted active:border-[hsl(var(--border-dark))] active:shadow-inner", 
                       item.type === 'folder' ? 'font-medium' : ''
                     )}
                     style={{ paddingLeft: `${0.5 + item.depth * 1}rem` }} // Indentation based on depth
@@ -61,7 +63,7 @@ export default function EditorPage() {
           <RetroWindow title="Code Editor - untitled.txt" className="h-full flex flex-col" contentClassName="p-0 flex-grow">
             <Textarea
               placeholder="Start typing your code here..."
-              className="flex-grow w-full h-full bg-input text-foreground border-0 focus:ring-0 resize-none font-mono text-sm rounded-none" // Ensure textarea fills space and has no internal padding/border
+              className="flex-grow w-full h-full bg-input text-foreground border-0 focus:ring-0 resize-none font-mono text-sm rounded-none" 
               aria-label="Code Editor"
             />
           </RetroWindow>

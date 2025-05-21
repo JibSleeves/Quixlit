@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { generateCodeFromPrompt, type GenerateCodeFromPromptInput, type GenerateCodeFromPromptOutput } from '@/ai/flows/generate-code-from-prompt-flow';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Loader2, Sparkles } from 'lucide-react';
+import { Loader2, Sparkles, Wand } from 'lucide-react'; // Changed icon to Wand
 
 export function CodeGenerator() {
   const [prompt, setPrompt] = useState('');
@@ -96,14 +96,12 @@ export function CodeGenerator() {
       
       <div className="mt-4 flex-grow flex flex-col min-h-0">
         {isLoading && !generatedResult && (
-          <div className="flex items-center justify-center flex-grow">
-            <div className="flex flex-col items-center text-muted-foreground">
-              <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
-              <p>AI is drafting your code...</p>
-            </div>
+          <div className="flex flex-col items-center justify-center flex-grow text-muted-foreground">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
+            <p>AI is drafting your code...</p>
           </div>
         )}
-        {generatedResult && (
+        {generatedResult && !isLoading && (
           <>
             <div className="flex justify-between items-center mb-1">
                 <h3 className="text-md font-semibold text-primary">Generated Code:</h3>
@@ -111,18 +109,18 @@ export function CodeGenerator() {
                     Language: {generatedResult.languageUsed}
                 </span>
             </div>
-            <ScrollArea className="flex-grow p-2 border border-[hsl(var(--border-dark))] bg-input mb-2">
+            <ScrollArea className="flex-grow p-2 border border-[hsl(var(--border-dark))] bg-input mb-2 min-h-[100px] max-h-[200px]">
               <Textarea
                   value={generatedResult.generatedCode}
                   readOnly
-                  className="w-full h-full bg-input text-foreground border-0 focus:ring-0 resize-none min-h-[100px] font-mono text-xs"
+                  className="w-full h-full bg-input text-foreground border-0 focus:ring-0 resize-none font-mono text-xs"
                   aria-label="Generated code"
               />
             </ScrollArea>
             {generatedResult.explanation && (
                 <>
                 <h4 className="text-sm font-semibold text-accent mb-1">Explanation:</h4>
-                <ScrollArea className="h-20 p-2 border border-[hsl(var(--border-dark))] bg-input">
+                <ScrollArea className="h-24 p-2 border border-[hsl(var(--border-dark))] bg-input">
                     <p className="text-xs text-muted-foreground whitespace-pre-wrap">{generatedResult.explanation}</p>
                 </ScrollArea>
                 </>
@@ -130,8 +128,10 @@ export function CodeGenerator() {
           </>
         )}
          {!isLoading && !generatedResult && !error && (
-           <div className="flex items-center justify-center flex-grow text-muted-foreground">
+           <div className="flex flex-col items-center justify-center flex-grow text-muted-foreground">
+             <Wand className="h-8 w-8 text-muted-foreground mb-2" />
              <p>Describe the code you want to generate.</p>
+             <p className="text-xs">Optionally, specify a preferred language.</p>
            </div>
          )}
       </div>
