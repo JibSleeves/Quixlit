@@ -162,3 +162,49 @@ body {
 .quixlit-logo-animate svg .logo-primary-fill {
   animation: logoGlow 3s infinite ease-in-out;
 }
+
+/* Monaco Editor Retro Styling */
+.retro-monaco-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.retro-monaco-editor {
+  /* Monaco editor container */
+  position: relative;
+}
+
+/* Add subtle scan lines effect to Monaco editor */
+.retro-monaco-editor::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.1) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.15;
+}
+
+/* Blink animation for cursor */
+@keyframes cursor-blink {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+/* Monaco editor override styles for retro effect */
+.monaco-editor .cursor {
+  animation: cursor-blink 1s steps(1) infinite !important;
+  background-color: hsl(var(--primary)) !important;
+}

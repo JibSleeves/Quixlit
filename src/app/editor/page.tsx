@@ -1,92 +1,186 @@
 
 "use client";
 
+import { useState, useEffect } from 'react';
 import { AppLayout } from '@/components/AppLayout';
 import { RetroWindow } from '@/components/RetroWindow';
-import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils'; 
+import { RetroTerminal } from '@/components/RetroTerminal';
+import { RetroMonacoEditor } from '@/components/RetroMonacoEditor';
+import { RetroFileExplorer } from '@/components/RetroFileExplorer';
+import { FileSystemItem, fileSystem } from '@/services/FileSystemService';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { Loader2 } from 'lucide-react';
 
-const fileSystemItems = [
-  { type: 'folder', name: 'project_root/', depth: 0 },
-  { type: 'file', name: 'README.md', depth: 1 },
-  { type: 'folder', name: 'src/', depth: 1 },
-  { type: 'file', name: 'app.tsx', depth: 2 },
-  { type: 'folder', name: 'components/', depth: 2 },
-  { type: 'file', name: 'Button.tsx', depth: 3 },
-  { type: 'file', name: 'Dialog.tsx', depth: 3 },
-  { type: 'folder', name: 'utils/', depth: 2 },
-  { type: 'file', name: 'helpers.ts', depth: 3 },
-  { type: 'file', name: 'package.json', depth: 1 },
-  { type: 'folder', name: 'public/', depth: 1 },
-  { type: 'file', name: 'favicon.ico', depth: 2 },
-  { type: 'file', name: 'image.png', depth: 2 },
-];
+// Sample welcome code
+const welcomeCode = `// Welcome to Quixlit Editor
+// A retro-styled code editor with local AI capabilities
+
+/**
+ * Key Features:
+ * 
+ * - Monaco Editor with retro styling
+ * - File management system
+ * - Multiple language support
+ * - Local LLM integration via llama.cpp
+ * - Multi-model support for different tasks
+ * - Git integration
+ * - Terminal with command execution
+ */
+
+function start() {
+  console.log('Quixlit Editor is ready!');
+  return true;
+}
+
+// Try selecting a file from the File Explorer!
+`;
 
 export default function EditorPage() {
+  const [code, setCode] = useState(welcomeCode);
+  const [activeFile, setActiveFile] = useState<FileSystemItem | null>(null);
+  const [loadingFile, setLoadingFile] = useState(false);
+  const [terminalContent, setTerminalContent] = useState('> Terminal ready. Type commands here...');
+
+  // Handle file selection
+  const handleFileSelect = async (file: FileSystemItem) => {
+    if (file.type === 'file') {
+      setLoadingFile(true);
+      try {
+        // Load file content
+        const content = await fileSystem.readFile(file.path);
+        setCode(content);
+        setActiveFile(file);
+      } catch (error) {
+        console.error('Error loading file:', error);
+        // Add error message to terminal
+        setTerminalContent(prev => `${prev}\n> Error loading file: ${file.path}`);
+      } finally {
+        setLoadingFile(false);
+      }
+    }
+  };
+
+  // Save file content
+  const handleSaveFile = async () => {
+    if (!activeFile || activeFile.type !== 'file') return;
+    
+    try {
+      await fileSystem.writeFile(activeFile.path, code);
+      setTerminalContent(prev => `${prev}\n> Saved file: ${activeFile.path}`);
+    } catch (error) {
+      console.error('Error saving file:', error);
+      setTerminalContent(prev => `${prev}\n> Error saving file: ${activeFile.path}`);
+    }
+  };
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Ctrl+S to save
+      if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+        event.preventDefault();
+        handleSaveFile();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeFile, code]);
+
   return (
-    // AppLayout already provides flex flex-col, so editor page itself can be flex-grow
-    <div className="flex flex-col gap-4 h-full flex-grow">
-      {/* Top row for File Explorer and Code Editor */}
-      <div className="flex flex-col lg:flex-row gap-4 flex-grow min-h-0">
-        {/* File Explorer Panel */}
-        <div className="lg:w-1/4 h-full min-h-[200px] lg:min-h-0">
-          <RetroWindow title="File Explorer" className="h-full flex flex-col" contentClassName="p-0">
-            <ScrollArea className="flex-grow bg-input">
-              <ul className="p-2 space-y-0.5">
-                {fileSystemItems.map((item, index) => (
-                  <li
-                    key={index}
-                    className={cn(
-                      "text-sm text-foreground cursor-pointer p-1 select-none truncate",
-                      "border border-transparent",
-                      "hover:bg-muted/60 hover:border-[hsl(var(--border))]",
-                      "active:bg-muted active:border-[hsl(var(--border-dark))] active:shadow-inner", 
-                      item.type === 'folder' ? 'font-medium' : ''
-                    )}
-                    style={{ paddingLeft: `${0.5 + item.depth * 1}rem` }}
-                    title={item.name}
-                  >
-                    {item.type === 'folder' ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline mr-2 h-4 w-4">
-                        <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
-                      </svg>
-                    ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--accent))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline mr-2 h-4 w-4">
-                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline>
-                      </svg>
-                    )}
-                    {item.name}
-                  </li>
-                ))}
-              </ul>
-            </ScrollArea>
-          </RetroWindow>
+    <AppLayout>
+      <div className="flex flex-col gap-4 h-full flex-grow">
+        {/* Top row for File Explorer and Code Editor */}
+        <div className="flex flex-col lg:flex-row gap-4 flex-grow min-h-0">
+          {/* File Explorer Panel */}
+          <div className="lg:w-1/4 h-full min-h-[200px] lg:min-h-0">
+            <RetroWindow title="File Explorer" className="h-full flex flex-col" contentClassName="p-0">
+              <RetroFileExplorer
+                rootPath="/project"
+                onFileSelect={handleFileSelect}
+              />
+            </RetroWindow>
+          </div>
+
+          {/* Code Editor Area Panel */}
+          <div className="lg:w-3/4 h-full min-h-[300px] lg:min-h-0">
+            <RetroWindow 
+              title={activeFile ? `Code Editor - ${activeFile.name}` : 'Code Editor - Welcome'} 
+              className="h-full flex flex-col" 
+              contentClassName="p-0 flex-grow relative"
+            >
+              {loadingFile ? (
+                <div className="absolute inset-0 flex items-center justify-center bg-background/70 z-10">
+                  <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <span className="text-sm text-muted-foreground">Loading file...</span>
+                  </div>
+                </div>
+              ) : null}
+              
+              <RetroMonacoEditor
+                value={code}
+                language={activeFile?.language || 'javascript'}
+                onChange={(value) => setCode(value || '')}
+                height="100%"
+                options={{
+                  minimap: { enabled: true },
+                  lineNumbers: 'on',
+                  scrollBeyondLastLine: false,
+                  automaticLayout: true,
+                }}
+              />
+            </RetroWindow>
+          </div>
         </div>
 
-        {/* Code Editor Area Panel */}
-        <div className="lg:w-3/4 h-full min-h-[300px] lg:min-h-0">
-          <RetroWindow title="Code Editor - untitled.txt" className="h-full flex flex-col" contentClassName="p-0 flex-grow">
-            <Textarea
-              placeholder="Start typing your code here..."
-              className="flex-grow w-full h-full bg-input text-foreground border-0 focus:ring-0 resize-none font-mono text-sm rounded-none" 
-              aria-label="Code Editor"
+        {/* Bottom row for Terminal/Logs */}
+        <div className="h-1/3 min-h-[150px]">
+          <RetroWindow title="Terminal / System Logs" className="h-full flex flex-col" contentClassName="p-0 flex-grow">
+            <RetroTerminal 
+              initialContent="Welcome to Quixlit Terminal v1.0.0
+> Type 'help' to see available commands."
+              onCommand={async (command) => {
+                // Process terminal commands
+                const cmd = command.toLowerCase().trim();
+                
+                if (cmd === 'help') {
+                  return `Available commands:
+  help - Show this help message
+  clear - Clear the terminal
+  save - Save the current file
+  ls - List files in the current directory
+  version - Show Quixlit version info`;
+                } else if (cmd === 'clear') {
+                  // The terminal will be cleared on the next render
+                  return '';
+                } else if (cmd === 'save') {
+                  // Save the current file
+                  await handleSaveFile();
+                  return activeFile 
+                    ? `File saved: ${activeFile.name}` 
+                    : 'No active file to save.';
+                } else if (cmd === 'ls') {
+                  return `Mock directory listing:
+  README.md
+  package.json
+  /src
+  /public`;
+                } else if (cmd === 'version') {
+                  return `Quixlit Editor v1.0.0
+  - Monaco Editor v1.74.1
+  - Next.js 15.2.3
+  - React 18.3.1`;
+                } else if (cmd.startsWith('echo ')) {
+                  return command.substring(5);
+                } else {
+                  return `Command not found: ${command}. Type 'help' for available commands.`;
+                }
+              }}
             />
           </RetroWindow>
         </div>
       </div>
-
-      {/* Bottom row for Terminal/Logs */}
-      <div className="h-1/3 min-h-[150px]">
-        <RetroWindow title="Terminal / System Logs" className="h-full flex flex-col" contentClassName="p-0 flex-grow">
-          <Textarea
-            placeholder="System logs and terminal output will appear here..."
-            readOnly
-            className="flex-grow w-full h-full bg-input text-muted-foreground border-0 focus:ring-0 resize-none font-mono text-xs rounded-none"
-            aria-label="Terminal and System Logs"
-          />
-        </RetroWindow>
-      </div>
-    </div>
+    </AppLayout>
   );
 }
